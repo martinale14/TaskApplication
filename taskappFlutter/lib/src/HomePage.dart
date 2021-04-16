@@ -27,7 +27,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     this._title = '';
     this._description = '';
-    _ip = '192.168.20.27';
+    _ip = '192.168.20.64';
     titleCon = TextEditingController();
     descCon = TextEditingController();
     this._initializeSocket();
@@ -145,10 +145,10 @@ class _HomePageState extends State<HomePage> {
     showGeneralDialog(
         barrierColor: Colors.black.withOpacity(0.5),
         transitionBuilder: (context, a1, a2, widget) {
-          final curvedValue = Curves.easeInOutBack.transform(a1.value) - 1.0;
+          final curvedValue = Curves.linearToEaseOut.transform(a1.value) - 1.0;
 
           return Transform(
-            transform: Matrix4.translationValues(0.0, curvedValue * -250, 0.0),
+            transform: Matrix4.translationValues(0.0, curvedValue * -300, 0.0),
             child: _showAddWindow(context),
           );
         },
