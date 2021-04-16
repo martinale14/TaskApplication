@@ -3,7 +3,8 @@ import AppLoading from 'expo-app-loading';
 import { StatusBar } from 'expo-status-bar';
 import React, { Component } from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { SafeAreaView, View, Text, StyleSheet, FlatList, TouchableOpacity, CheckBox } from 'react-native';
+import { CheckBox } from 'react-native-elements'
+import { SafeAreaView, View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 
 
 class App extends Component {
@@ -40,7 +41,7 @@ class App extends Component {
   }
 
   fetchData() {
-    fetch('http://192.168.20.64:3000/api/tasks')
+    fetch('http://192.168.20.27:3000/api/tasks')
       .then(res => res.json())
       .then(data => {
         console.log(data);
@@ -51,7 +52,7 @@ class App extends Component {
   }
 
   addTask(e) {
-    fetch('http://192.168.20.64:3000/api/tasks', {
+    fetch('http://192.168.20.27:3000/api/tasks', {
       method: 'POST',
       body: JSON.stringify({ title: this.state.title, description: this.state.description }),
       headers: {
@@ -135,14 +136,15 @@ class App extends Component {
                   flexDirection: 'row',
                   padding: 10,
                 }}>
-                  <CheckBox value={item.isChecked} tintColors={{ true: 'white', false: 'white' }}
-                    style={{
-                      flex: 0.4,
-                      justifyContent: 'center'
-                    }} onValueChange={(val) => {
-                      this.state.tasks[index].isChecked = val;
+                  <CheckBox checked={this.state.tasks[index].isChecked}
+                    checkedColor='#2076D2'
+                    uncheckedColor='#2076D2'
+                    onPress={() => {
+                      this.state.tasks[index].isChecked = !this.state.tasks[index].isChecked;
                       this.setState({});
-                    }} />
+                    }
+                    }
+                  />
                   <Text style={styles.myFont}>
                     {item.title}
                   </Text>
