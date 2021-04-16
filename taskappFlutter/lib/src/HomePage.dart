@@ -18,18 +18,24 @@ class _HomePageState extends State<HomePage> {
   WebSocketChannel _socket;
   String _title;
   String _description;
+  TextEditingController titleCon;
+  TextEditingController descCon;
+  String _ip;
 
   @override
   void initState() {
     super.initState();
     this._title = '';
     this._description = '';
+    _ip = '192.168.20.27';
+    titleCon = TextEditingController();
+    descCon = TextEditingController();
     this._initializeSocket();
   }
 
   _initializeSocket() async {
     // ignore: await_only_futures
-    this._socket = await IOWebSocketChannel.connect('ws://192.168.20.64:3000');
+    this._socket = await IOWebSocketChannel.connect("ws://${this._ip}:3000");
     this._socket.stream.listen((event) {
       if (event == 'makeChange') {
         setState(() {
@@ -71,16 +77,19 @@ class _HomePageState extends State<HomePage> {
               )),
         ),
         floatingActionButton: Row(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisSize: MainAxisSize.max,
           children: [
             FloatingActionButton(
                 child: Icon(Icons.delete),
                 onPressed: () {
                   this._deleteTask();
                 }),
-            SizedBox(width: 10),
+            SizedBox(
+              width: 15,
+            ),
             FloatingActionButton(child: Icon(Icons.edit), onPressed: () {}),
-            SizedBox(width: 180),
+            SizedBox(width: 165),
             FloatingActionButton(
               child: Icon(Icons.add),
               onPressed: () {
@@ -95,7 +104,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<List<Task>> _fetchData() async {
     http.Response response =
-        await http.get('http://192.168.20.64:3000/api/tasks');
+        await http.get("http://${this._ip}:3000/api/tasks");
     List<dynamic> data = jsonDecode(response.body) as List;
     List<Task> maps = data.map((e) => Task.fromJson(e)).toList();
     return maps;
@@ -147,11 +156,14 @@ class _HomePageState extends State<HomePage> {
         barrierDismissible: true,
         barrierLabel: '',
         context: context,
-        pageBuilder: (context, animation1, animation2) {});
+        pageBuilder: (context, animation1, animation2) {
+          return Container();
+        });
   }
 
   Widget _showAddWindow(BuildContext context) {
     return AlertDialog(
+      insetPadding: EdgeInsets.all(30),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       titlePadding: EdgeInsets.zero,
       title: Container(
@@ -175,6 +187,7 @@ class _HomePageState extends State<HomePage> {
           children: [
             Container(
               child: TextField(
+                controller: titleCon,
                 onChanged: (value) {
                   this._title = value;
                 },
@@ -183,6 +196,7 @@ class _HomePageState extends State<HomePage> {
             ),
             Container(
               child: TextField(
+                controller: descCon,
                 maxLines: 5,
                 onChanged: (value) {
                   this._description = value;
@@ -220,7 +234,14 @@ class _HomePageState extends State<HomePage> {
                   height: 45,
                   child: ElevatedButton(
                       onPressed: () {
-                        Navigator.pop(context);
+                        print(descCon.text);
+                        if (titleCon.text != '' && descCon.text != '') {
+                          print('Presed');
+                          this._addTask();
+                          descCon.text = '';
+                          titleCon.text = '';
+                          Navigator.pop(context);
+                        }
                       },
                       style: ButtonStyle(
                           shape: MaterialStateProperty.all<OutlinedBorder>(
@@ -239,9 +260,9 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  _addTask() async {
+  void _addTask() async {
     http.Response respuesta = await http.post(
-        'http://192.168.20.64:3000/api/tasks',
+        "http://${this._ip}:3000/api/tasks",
         headers: {
           'Content-type': 'application/json',
           'Accept': 'application/json'
@@ -250,11 +271,12 @@ class _HomePageState extends State<HomePage> {
             '{"title": "${this._title}", "description": "${this._description}"}');
     this._title = '';
     this._description = '';
+    print('entre');
     print(respuesta.body);
     setState(() {
       this._fetchData();
     });
-    this._socket.sink.add('true');
+    //this._socket.sink.add('true');
   }
 
   _deleteTask() {
