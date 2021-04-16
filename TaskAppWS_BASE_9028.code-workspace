@@ -1,13 +1,10 @@
 {
 	"folders": [
 		{
-			"path": "taskappFlutter"
+			"path": "taskapp"
 		},
 		{
 			"path": "WebTasksApp"
-		},
-		{
-			"path": "taskappReactNative"
 		}
 	],
 	"settings": {}

@@ -13,8 +13,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<bool> _checked = new List<bool>();
-  List<String> _idTo = new List<String>();
+  List<bool> _checked = <bool>[];
+  List<String> _idTo = <String>[];
   WebSocketChannel _socket;
   String _title;
   String _description;
@@ -41,49 +41,54 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Task App'),
-        centerTitle: true,
-      ),
-      body: Container(
-        padding: EdgeInsets.all(0),
-        margin: EdgeInsets.all(0),
-        decoration: BoxDecoration(color: Colors.white.withOpacity(0)),
-        child: Align(
-            alignment: Alignment.topCenter,
-            child: FutureBuilder(
-              future: _fetchData(),
-              builder:
-                  (BuildContext context, AsyncSnapshot<List<Task>> snapshot) {
-                if (snapshot.hasData) {
-                  List<Task> tasks = snapshot.data;
-                  return _createTable(tasks);
-                } else if (snapshot.hasError) {
-                  return Text('${snapshot.error}');
-                }
+    return SafeArea(
+      top: true,
+      bottom: true,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Task App'),
+          centerTitle: true,
+        ),
+        body: Container(
+          padding: EdgeInsets.all(0),
+          margin: EdgeInsets.all(0),
+          decoration: BoxDecoration(color: Colors.white.withOpacity(0)),
+          child: Align(
+              alignment: Alignment.topCenter,
+              child: FutureBuilder(
+                future: _fetchData(),
+                builder:
+                    (BuildContext context, AsyncSnapshot<List<Task>> snapshot) {
+                  if (snapshot.hasData) {
+                    List<Task> tasks = snapshot.data;
+                    return _createTable(tasks);
+                  } else if (snapshot.hasError) {
+                    return Text('${snapshot.error}');
+                  }
 
-                return CircularProgressIndicator();
-              },
-            )),
-      ),
-      floatingActionButton: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          FloatingActionButton(
-              child: Icon(Icons.delete),
-              onPressed: () {
-                this._deleteTask();
-              }),
-          SizedBox(width: 10),
-          FloatingActionButton(child: Icon(Icons.edit), onPressed: () {}),
-          SizedBox(width: 180),
-          FloatingActionButton(
+                  return CircularProgressIndicator();
+                },
+              )),
+        ),
+        floatingActionButton: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            FloatingActionButton(
+                child: Icon(Icons.delete),
+                onPressed: () {
+                  this._deleteTask();
+                }),
+            SizedBox(width: 10),
+            FloatingActionButton(child: Icon(Icons.edit), onPressed: () {}),
+            SizedBox(width: 180),
+            FloatingActionButton(
               child: Icon(Icons.add),
               onPressed: () {
-                this._showAddWindow();
-              }),
-        ],
+                this._showAnimatedWindow(context);
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -97,7 +102,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _createTable(List<Task> tasks) {
-    List<DataRow> myRows = List<DataRow>();
+    List<DataRow> myRows = <DataRow>[];
     tasks.asMap().forEach((i, e) {
       _checked.add(false);
       _idTo.add('none');
@@ -127,52 +132,111 @@ class _HomePageState extends State<HomePage> {
     ], rows: myRows);
   }
 
-  _showAddWindow() {
-    showDialog(
+  void _showAnimatedWindow(BuildContext context) {
+    showGeneralDialog(
+        barrierColor: Colors.black.withOpacity(0.5),
+        transitionBuilder: (context, a1, a2, widget) {
+          final curvedValue = Curves.easeInOutBack.transform(a1.value) - 1.0;
+
+          return Transform(
+            transform: Matrix4.translationValues(0.0, curvedValue * -250, 0.0),
+            child: _showAddWindow(context),
+          );
+        },
+        transitionDuration: Duration(milliseconds: 250),
+        barrierDismissible: true,
+        barrierLabel: '',
         context: context,
-        builder: (_) {
-          return AlertDialog(
-            title: Text('Add Task'),
-            content: Form(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    child: TextField(
-                      onChanged: (value) {
-                        this._title = value;
-                      },
-                      decoration: InputDecoration(labelText: 'Title'),
-                    ),
-                  ),
-                  Container(
-                    child: TextField(
-                      maxLines: 5,
-                      onChanged: (value) {
-                        this._description = value;
-                      },
-                      decoration: InputDecoration(labelText: 'Description'),
-                    ),
-                  )
-                ],
+        pageBuilder: (context, animation1, animation2) {});
+  }
+
+  Widget _showAddWindow(BuildContext context) {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      titlePadding: EdgeInsets.zero,
+      title: Container(
+        width: MediaQuery.of(context).size.width,
+        height: 70,
+        margin: EdgeInsets.zero,
+        child: Center(
+          child: Text(
+            'Add Task',
+            style: TextStyle(
+                fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white),
+          ),
+        ),
+        decoration: BoxDecoration(
+            color: Colors.blue,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      ),
+      content: Form(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              child: TextField(
+                onChanged: (value) {
+                  this._title = value;
+                },
+                decoration: InputDecoration(labelText: 'Title'),
               ),
             ),
-            actions: <Widget>[
-              FlatButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('Close')),
-              FlatButton(
-                onPressed: () {
-                  this._addTask();
-                  Navigator.of(context).pop();
+            Container(
+              child: TextField(
+                maxLines: 5,
+                onChanged: (value) {
+                  this._description = value;
                 },
-                child: Text('Agregar'),
-              )
-            ],
-          );
-        });
+                decoration: InputDecoration(labelText: 'Description'),
+              ),
+            ),
+            SizedBox(
+              height: 30,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                SizedBox(
+                  width: 120,
+                  height: 45,
+                  child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      style: ButtonStyle(
+                          shape: MaterialStateProperty.all<OutlinedBorder>(
+                              RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10)))),
+                      child: Text(
+                        'Cancelar',
+                        style: TextStyle(fontSize: 18),
+                      )),
+                ),
+                SizedBox(
+                  width: 20,
+                ),
+                SizedBox(
+                  width: 120,
+                  height: 45,
+                  child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      style: ButtonStyle(
+                          shape: MaterialStateProperty.all<OutlinedBorder>(
+                              RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10)))),
+                      child: Text(
+                        'Agregar',
+                        style: TextStyle(fontSize: 18),
+                      )),
+                )
+              ],
+            )
+          ],
+        ),
+      ),
+    );
   }
 
   _addTask() async {
