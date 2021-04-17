@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 
 class App extends Component {
 
+    url = '192.168.20.27';
+
     constructor(props) {
         super(props);
         this.state = {
@@ -16,7 +18,7 @@ class App extends Component {
 
     componentDidMount() {
         this.fetchData();
-        this.socket = new WebSocket('ws://192.168.20.64:3000');
+        this.socket = new WebSocket(`ws://${this.url}:3000`);
         this.socket.addEventListener('open', function (event) {
             console.log('Connected to WS Server')
         });

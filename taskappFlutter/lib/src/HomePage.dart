@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:taskapp/src/ToDosList.dart';
 import 'package:web_socket_channel/io.dart';
 import 'dart:convert';
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -13,7 +14,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<bool> _checked = <bool>[];
   List<String> _idTo = <String>[];
   WebSocketChannel _socket;
   String _title;
@@ -21,13 +21,14 @@ class _HomePageState extends State<HomePage> {
   TextEditingController titleCon;
   TextEditingController descCon;
   String _ip;
+  List<Task> myTasks = <Task>[];
 
   @override
   void initState() {
     super.initState();
     this._title = '';
     this._description = '';
-    _ip = '192.168.20.64';
+    _ip = '192.168.20.27';
     titleCon = TextEditingController();
     descCon = TextEditingController();
     this._initializeSocket();
@@ -66,8 +67,13 @@ class _HomePageState extends State<HomePage> {
                 builder:
                     (BuildContext context, AsyncSnapshot<List<Task>> snapshot) {
                   if (snapshot.hasData) {
-                    List<Task> tasks = snapshot.data;
-                    return _createTable(tasks);
+                    this.myTasks = snapshot.data;
+
+                    return Container(
+                      child: TodosList(
+                        tasks: this.myTasks,
+                      ),
+                    );
                   } else if (snapshot.hasError) {
                     return Text('${snapshot.error}');
                   }
@@ -107,38 +113,8 @@ class _HomePageState extends State<HomePage> {
         await http.get("http://${this._ip}:3000/api/tasks");
     List<dynamic> data = jsonDecode(response.body) as List;
     List<Task> maps = data.map((e) => Task.fromJson(e)).toList();
+    this.myTasks = maps;
     return maps;
-  }
-
-  Widget _createTable(List<Task> tasks) {
-    List<DataRow> myRows = <DataRow>[];
-    tasks.asMap().forEach((i, e) {
-      _checked.add(false);
-      _idTo.add('none');
-      myRows.add(DataRow(cells: [
-        DataCell(Checkbox(
-          value: _checked[i],
-          onChanged: (value) {
-            setState(() {
-              _checked[i] = value;
-              if (value == true) {
-                _idTo[i] = e.id;
-              } else {
-                _idTo.removeAt(i);
-              }
-            });
-          },
-        )),
-        DataCell(Text('${e.title}')),
-        DataCell(Text('${e.description}'))
-      ]));
-    });
-
-    return DataTable(columns: [
-      DataColumn(label: Text('Check')),
-      DataColumn(label: Text('Title')),
-      DataColumn(label: Text('Description'))
-    ], rows: myRows);
   }
 
   void _showAnimatedWindow(BuildContext context) {
@@ -234,7 +210,6 @@ class _HomePageState extends State<HomePage> {
                   height: 45,
                   child: ElevatedButton(
                       onPressed: () {
-                        print(descCon.text);
                         if (titleCon.text != '' && descCon.text != '') {
                           print('Presed');
                           this._addTask();

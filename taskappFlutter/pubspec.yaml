@@ -24,7 +24,8 @@ dependencies:
   flutter:
     sdk: flutter
   http: "^0.12.2"
-  web_socket_channel: "^1.2.0" 
+  web_socket_channel: "^1.2.0"
+  flutter_slidable: "^0.6.0" 
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
