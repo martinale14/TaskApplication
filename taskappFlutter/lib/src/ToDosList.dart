@@ -11,13 +11,9 @@ class TodosList extends StatefulWidget {
 }
 
 class _TodosListState extends State<TodosList> {
-  List<Task> _tasks = <Task>[];
-
   @override
   void initState() {
     super.initState();
-    this._tasks = widget.tasks;
-    setState(() {});
   }
 
   @override
@@ -31,9 +27,8 @@ class _TodosListState extends State<TodosList> {
 
   List<Widget> _listItem() {
     List<Widget> items = [];
-
-    if (this._tasks != null) {
-      this._tasks.forEach((task) {
+    if (widget.tasks != null) {
+      widget.tasks.forEach((task) {
         items.add(Slidable(
           actionPane: SlidableDrawerActionPane(),
           actionExtentRatio: 0.25,

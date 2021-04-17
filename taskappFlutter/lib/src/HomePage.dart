@@ -39,9 +39,7 @@ class _HomePageState extends State<HomePage> {
     this._socket = await IOWebSocketChannel.connect("ws://${this._ip}:3000");
     this._socket.stream.listen((event) {
       if (event == 'makeChange') {
-        setState(() {
-          this._fetchData();
-        });
+        setState(() {});
       }
     });
   }
@@ -67,12 +65,8 @@ class _HomePageState extends State<HomePage> {
                 builder:
                     (BuildContext context, AsyncSnapshot<List<Task>> snapshot) {
                   if (snapshot.hasData) {
-                    this.myTasks = snapshot.data;
-
-                    return Container(
-                      child: TodosList(
-                        tasks: this.myTasks,
-                      ),
+                    return TodosList(
+                      tasks: this.myTasks,
                     );
                   } else if (snapshot.hasError) {
                     return Text('${snapshot.error}');
@@ -114,6 +108,7 @@ class _HomePageState extends State<HomePage> {
     List<dynamic> data = jsonDecode(response.body) as List;
     List<Task> maps = data.map((e) => Task.fromJson(e)).toList();
     this.myTasks = maps;
+    print(maps[maps.length - 1].title);
     return maps;
   }
 
@@ -211,7 +206,6 @@ class _HomePageState extends State<HomePage> {
                   child: ElevatedButton(
                       onPressed: () {
                         if (titleCon.text != '' && descCon.text != '') {
-                          print('Presed');
                           this._addTask();
                           descCon.text = '';
                           titleCon.text = '';
@@ -236,8 +230,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _addTask() async {
-    http.Response respuesta = await http.post(
-        "http://${this._ip}:3000/api/tasks",
+    await http.post("http://${this._ip}:3000/api/tasks",
         headers: {
           'Content-type': 'application/json',
           'Accept': 'application/json'
@@ -246,18 +239,12 @@ class _HomePageState extends State<HomePage> {
             '{"title": "${this._title}", "description": "${this._description}"}');
     this._title = '';
     this._description = '';
-    print('entre');
-    print(respuesta.body);
-    setState(() {
-      this._fetchData();
-    });
-    //this._socket.sink.add('true');
+    this._socket.sink.add('true');
+    setState(() {});
   }
 
   _deleteTask() {
-    this._idTo.asMap().forEach((i, e) {
-      print('dato ' + e);
-    });
+    this._idTo.asMap().forEach((i, e) {});
     this._socket.sink.add('true');
   }
 
