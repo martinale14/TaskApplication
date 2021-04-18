@@ -49,8 +49,12 @@ class _HomePageState extends State<HomePage> {
                     return TodosList(
                       tasks: this.myTasks,
                       deleteCallBack: () {
-                        setState(() {});
                         this._socket.changeMaked();
+                        setState(() {});
+                      },
+                      updateCallBack: () {
+                        this._socket.changeMaked();
+                        setState(() {});
                       },
                     );
                   } else if (snapshot.hasError) {
@@ -62,21 +66,20 @@ class _HomePageState extends State<HomePage> {
               )),
         ),
         floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.add),
-          onPressed: () {
-            AddDialog().showAnimatedWindow(context, () {
-              this._socket.changeMaked();
-              setState(() {});
-            });
-          },
-        ),
+            child: Icon(Icons.add),
+            onPressed: () {
+              AddDialog().showAnimatedWindow(context, addCallBack: () {
+                this._socket.changeMaked();
+                setState(() {});
+              });
+            }),
       ),
     );
   }
 
   @override
   void dispose() {
-    this._socket..changeMaked();
+    this._socket.changeMaked();
     super.dispose();
   }
 }

@@ -4,15 +4,20 @@ import 'package:taskapp/controllers/Petitions.dart';
 class AddDialog {
   TextEditingController titleCon = TextEditingController();
   TextEditingController descCon = TextEditingController();
-  String titleEdit = '';
-  String descEdit = '';
+  String idEdit = '';
 
-  AddDialog({String titleEdit, String descEdit}) {
-    this.titleEdit = titleEdit;
-    this.descEdit = descEdit;
+  AddDialog({String titleEdit, String descEdit, String idEdit}) {
+    if (idEdit != null) {
+      this.idEdit = idEdit;
+    }
+    if (idEdit != null) {
+      titleCon.text = titleEdit;
+      descCon.text = descEdit;
+    }
   }
 
-  void showAnimatedWindow(BuildContext context, Function addCallBack) {
+  void showAnimatedWindow(BuildContext context,
+      {Function addCallBack, Function editCallBack}) {
     showGeneralDialog(
         barrierColor: Colors.black.withOpacity(0.5),
         transitionBuilder: (context, a1, a2, widget) {
@@ -20,7 +25,8 @@ class AddDialog {
 
           return Transform(
             transform: Matrix4.translationValues(0.0, curvedValue * -300, 0.0),
-            child: _showAddWindow(context, addCallBack),
+            child: _showAddWindow(context, addCallBack,
+                editCallBack: editCallBack),
           );
         },
         transitionDuration: Duration(milliseconds: 250),
@@ -32,7 +38,8 @@ class AddDialog {
         });
   }
 
-  Widget _showAddWindow(BuildContext context, Function addCallBack) {
+  Widget _showAddWindow(BuildContext context, Function addCallBack,
+      {Function editCallBack}) {
     return AlertDialog(
       insetPadding: EdgeInsets.all(30),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -101,8 +108,15 @@ class AddDialog {
                   child: ElevatedButton(
                       onPressed: () {
                         if (titleCon.text != '' && descCon.text != '') {
-                          Petitions().addTask(titleCon.text, descCon.text,
-                              callBack: addCallBack);
+                          if (this.idEdit != '') {
+                            print('aqui me trabe');
+                            Petitions().editTask(this.idEdit, titleCon.text,
+                                descCon.text, editCallBack);
+                          } else {
+                            Petitions().addTask(titleCon.text, descCon.text,
+                                callBack: addCallBack);
+                          }
+                          this.idEdit = '';
                           descCon.text = '';
                           titleCon.text = '';
                           Navigator.pop(context);

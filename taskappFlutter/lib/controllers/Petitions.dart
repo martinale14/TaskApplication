@@ -34,4 +34,14 @@ class Petitions {
     });
     callBack();
   }
+
+  void editTask(String id, String title, String desc, Function callBack) async {
+    await http.put("http://${this.ip}:3000/api/tasks/$id",
+        headers: {
+          'Content-type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: '{"title": "$title", "description": "$desc"}');
+    callBack();
+  }
 }
