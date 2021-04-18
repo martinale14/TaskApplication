@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:taskapp/helpers/Tasks.dart';
+import 'package:taskapp/controllers/Petitions.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
 class TodosList extends StatefulWidget {
   final List<Task> tasks;
+  final Function deleteCallBack;
 
-  TodosList({Key key, @required this.tasks}) : super(key: key);
+  TodosList({Key key, @required this.tasks, @required this.deleteCallBack})
+      : super(key: key);
   @override
   _TodosListState createState() => _TodosListState();
 }
 
 class _TodosListState extends State<TodosList> {
   @override
-  void initState() {
+  void initState({Function deleteCallBack}) {
     super.initState();
   }
 
@@ -55,7 +58,9 @@ class _TodosListState extends State<TodosList> {
               caption: 'Delete',
               color: Colors.red,
               icon: Icons.delete,
-              onTap: () => {},
+              onTap: () {
+                Petitions().deleteTask(task.id, widget.deleteCallBack);
+              },
             ),
           ],
         ));
