@@ -6,6 +6,7 @@ const wss = new WebSocket.Server({ server: server });
 const morgan = require('morgan');
 const path = require('path');
 const parser = require('body-parser');
+const petition = require('node-fetch');
 
 const { mongoose } = require('./database');
 
@@ -40,6 +41,7 @@ wss.on('connection', (socket) => {
     socket.on('message', (message) => {
         console.log('Mensaje ' + message);
         if (message == 'true') {
+            sendOneSignal();
             wss.clients.forEach((client) => {
                 client.send('makeChange');
             });
@@ -52,3 +54,24 @@ server.listen(app.get('port'), () => {
     console.log(`Server on Port ${app.get('port')}`);
 
 });
+
+function sendOneSignal() {
+    petition('https://onesignal.com/api/v1/notifications', {
+        method: 'POST',
+        body: JSON.stringify({
+            "app_id": "b036c833-f224-4e19-b953-157c30335330",
+            "contents": { "en": "New changes were made" },
+            "included_segments": ["All"]
+        }),
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Basic YzMwZmY3ZTctZWRiOC00MGE2LWJmMmItN2VkZmZmYWVjMWM0'
+        }
+    })
+        .then(res => res.json())
+        .then(data => {
+            console.log(data);
+        })
+        .catch(err => console.error(err));
+}

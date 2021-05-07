@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 class App extends Component {
 
-    url = '192.168.20.64';
+    url = '192.168.20.27';
 
     constructor(props) {
         super(props);
