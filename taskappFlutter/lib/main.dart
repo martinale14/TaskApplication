@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:taskapp/src/HomePage.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  //Remove this method to stop OneSignal Debugging
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({Key key}) : super(key: key);
 
+  //Remove this method to stop OneSignal Debugging
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

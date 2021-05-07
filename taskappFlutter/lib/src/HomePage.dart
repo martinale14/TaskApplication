@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:taskapp/controllers/Petitions.dart';
 import 'package:taskapp/src/AddDialog.dart';
 import 'package:taskapp/src/ToDosList.dart';
@@ -19,6 +20,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    initializeOneSignal();
     _socket = SocketCon(() {
       setState(() {});
     });
@@ -81,5 +83,9 @@ class _HomePageState extends State<HomePage> {
   void dispose() {
     this._socket.changeMaked();
     super.dispose();
+  }
+
+  void initializeOneSignal() {
+    OneSignal.shared.init("b036c833-f224-4e19-b953-157c30335330");
   }
 }
